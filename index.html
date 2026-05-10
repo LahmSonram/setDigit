@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบคำนวณและสลับตัวเลข</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            width: 100%;
+            max-width: 600px;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            margin-top: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: 'Prompt', sans-serif;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .btn-submit {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            font-family: 'Prompt', sans-serif;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-submit:active {
+            transform: scale(0.98);
+        }
+
+        .result-container {
+            display: none;
+            margin-top: 30px;
+            border-top: 2px dashed #e5e7eb;
+            padding-top: 20px;
+        }
+
+        .result-box {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .result-title {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .result-data {
+            word-wrap: break-word;
+            line-height: 1.6;
+            color: #4b5563;
+            background: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .badge {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            margin-left: 5px;
+        }
+
+        .btn-copy {
+            background-color: #10b981;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            font-size: 0.85em;
+            font-weight: 500;
+            font-family: 'Prompt', sans-serif;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-copy:hover {
+            background-color: #059669;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>✨ ระบบตัวเลข</h2>
+        
+        <div class="input-group">
+            <label for="num1">ช่องที่ 1: กรอกชุดตัวเลข (เช่น 045)</label>
+            <input type="text" id="num1" placeholder="กรอกตัวเลขที่นี่..." autocomplete="off">
+        </div>
+        
+        <div class="input-group">
+            <label for="num2">ช่องที่ 2: กรอกชุดตัวเลข (ถ้ามี)</label>
+            <input type="text" id="num2" placeholder="กรอกตัวเลขชุดที่ 2..." autocomplete="off">
+        </div>
+
+        <button class="btn-submit" onclick="handleCalculate()">ตกลง (คำนวณผลลัพธ์)</button>
+
+        <div id="output" class="result-container">
+            <!-- ผลลัพธ์จะแสดงที่นี่ -->
+        </div>
+    </div>
+
+    <script>
+        // ฟังก์ชันหา Permutation (สลับตำแหน่ง)
+        function getPermutations(string) {
+            if (string.length <= 1) return new Set([string]);
+            const perms = new Set();
+            for (let i = 0; i < string.length; i++) {
+                const char = string[i];
+                const remaining = string.slice(0, i) + string.slice(i + 1);
+                for (const perm of getPermutations(remaining)) {
+                    perms.add(char + perm);
+                }
+            }
+            return perms;
+        }
+
+        // ฟังก์ชันหา Cartesian Product ของ Array หลายๆ ตัว (เหมือน loop ซ้อนกัน)
+        function cartesianProductStrs(arrays) {
+            if (arrays.length === 0) return [];
+            let result = arrays[0].map(x => [x]);
+            for (let i = 1; i < arrays.length; i++) {
+                const temp = [];
+                for (const res of result) {
+                    for (const val of arrays[i]) {
+                        temp.push([...res, val]);
+                    }
+                }
+                result = temp;
+            }
+            return result.map(arr => arr.join(''));
+        }
+
+        // ฟังก์ชันคำนวณหลัก
+        function processNumber(numStr) {
+            if (!numStr || !/^\d+$/.test(numStr)) return null;
+
+            const prepareD = [];
+            for (let i = 0; i < numStr.length; i++) {
+                const d = numStr[i];
+                const dInt = parseInt(d);
+                const toPrepare = new Set();
+                
+                toPrepare.add(d);
+                toPrepare.add(((dInt + 1) % 10).toString());
+                toPrepare.add(((dInt - 1 + 10) % 10).toString());
+
+                if (d === '9') toPrepare.add('6');
+                else if (d === '6') toPrepare.add('9');
+                else if (d === '1') { toPrepare.add('4'); toPrepare.add('7'); }
+                else if (d === '4') { toPrepare.add('1'); toPrepare.add('7'); toPrepare.add('8'); }
+                else if (d === '7') { toPrepare.add('1'); toPrepare.add('4'); }
+                else if (d === '8') { toPrepare.add('3'); toPrepare.add('4'); }
+                else if (d === '2') toPrepare.add('5');
+                else if (d === '5') { toPrepare.add('0'); toPrepare.add('2'); }
+                else if (d === '0') toPrepare.add('5');
+                else if (d === '3') toPrepare.add('8');
+
+                prepareD.push(Array.from(toPrepare));
+            }
+
+            const combinations = cartesianProductStrs(prepareD);
+            let finalResults = new Set();
+            for (const combo of combinations) {
+                const perms = getPermutations(combo);
+                for (const p of perms) {
+                    finalResults.add(p);
+                }
+            }
+            
+            return Array.from(finalResults).sort(); 
+        }
+
+        // ฟังก์ชันคัดลอกข้อความ
+        function copyToClipboard(elementId, btnElement) {
+            const textToCopy = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const originalText = btnElement.innerText;
+                btnElement.innerText = 'คัดลอกแล้ว! ✅';
+                btnElement.style.backgroundColor = '#059669'; // เปลี่ยนสีเขียวเข้มขึ้น
+                
+                // คืนค่าปุ่มกลับเหมือนเดิมหลังจาก 2 วินาที
+                setTimeout(() => {
+                    btnElement.innerText = '📋 คัดลอก';
+                    btnElement.style.backgroundColor = '#10b981';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                alert('ไม่สามารถคัดลอกได้ เบราว์เซอร์ของคุณอาจไม่รองรับ');
+            });
+        }
+
+        // ฟังก์ชันสร้าง UI แสดงผลลัพธ์
+        function renderResult(numStr, index) {
+            const results = processNumber(numStr);
+            if (!results) return '';
+
+            const resultText = results.join(', ');
+            const resultId = `result-data-${index}`; // สร้าง ID ไม่ซ้ำกันสำหรับแต่ละกล่อง
+
+            return `
+                <div class="result-box">
+                    <div class="result-header">
+                        <div class="result-title">
+                            ผลลัพธ์ช่องที่ ${index} (จากเลข ${numStr}) 
+                            <span class="badge">${results.length} รายการ</span>
+                        </div>
+                        <button class="btn-copy" onclick="copyToClipboard('${resultId}', this)">📋 คัดลอก</button>
+                    </div>
+                    <div class="result-data" id="${resultId}">
+                        ${resultText}
+                    </div>
+                </div>
+            `;
+        }
+
+        // ฟังก์ชันเมื่อกดปุ่ม "ตกลง"
+        function handleCalculate() {
+            const num1 = document.getElementById('num1').value.trim();
+            const num2 = document.getElementById('num2').value.trim();
+            const outputDiv = document.getElementById('output');
+            
+            let htmlContent = '';
+
+            if (!num1 && !num2) {
+                alert('กรุณากรอกตัวเลขอย่างน้อย 1 ช่องครับ');
+                return;
+            }
+
+            if (num1) {
+                const res1 = renderResult(num1, 1);
+                htmlContent += res1 || '<p style="color:red; margin-bottom:10px;">กรุณากรอกเฉพาะตัวเลขในช่องที่ 1</p>';
+            }
+            
+            if (num2) {
+                const res2 = renderResult(num2, 2);
+                htmlContent += res2 || '<p style="color:red;">กรุณากรอกเฉพาะตัวเลขในช่องที่ 2</p>';
+            }
+
+            outputDiv.innerHTML = htmlContent;
+            outputDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
